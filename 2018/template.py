@@ -6,7 +6,7 @@ def get_input():
     if DEBUG:
         pass
     else:
-        with open(DAY + '/input') as f:
+        with open(str(DAY) + '/input') as f:
             return f.readlines()
 
 
