@@ -1,4 +1,4 @@
-import { openFile } from '../helper.mjs';
+import { openFile } from '../helper.ts/index.js';
 
 const data = await openFile('4');
 
