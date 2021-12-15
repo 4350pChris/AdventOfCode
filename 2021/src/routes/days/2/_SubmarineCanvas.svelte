@@ -6,12 +6,14 @@
 	import type { GeneratorResult } from '$lib/2';
 
 	export let size: number;
+	export let xScale: number = 1;
 	export let genFn: () => Generator<GeneratorResult, void>;
 
 	let gen = genFn();
 	let submarine: THREE.Material;
 	const depth = tweened(0);
 	const horizontal = tweened(0);
+	const aim = tweened(0);
 	let done = false;
 
 	let hLineGeometry: THREE.BufferGeometry;
@@ -36,8 +38,11 @@
 		const res = gen.next();
 		if (!res.done) {
 			const val = res.value as GeneratorResult;
-			horizontal.set(val.horizontal);
+			horizontal.set(val.horizontal * xScale);
 			depth.set(val.depth);
+			if (val.aim) {
+				aim.set(val.aim);
+			}
 		} else {
 			done = res.done;
 		}
@@ -53,6 +58,9 @@
 	});
 </script>
 
+{#if $aim}
+	<div class="text-lg">Current Aim: <code>{Math.floor($aim)}</code></div>
+{/if}
 <div class="relative" style="width: 400px; height: 400px">
 	<div class="absolute left-8 z-50 block" style={`top: ${20 + ($depth / (size / 2)) * 400}px;`}>
 		depth <code>{Math.floor($depth)}</code>
@@ -61,7 +69,7 @@
 		class="absolute top-6 z-50 block"
 		style={`left: ${20 + ($horizontal / (size / 2)) * 400}px;`}
 	>
-		position <code>{Math.floor($horizontal)}</code>
+		position <code>{Math.floor($horizontal / xScale)}</code>
 	</div>
 	<SC.Canvas antialias>
 		<SC.PerspectiveCamera
