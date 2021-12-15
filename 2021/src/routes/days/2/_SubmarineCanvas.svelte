@@ -48,6 +48,8 @@
 		}
 	});
 
+	let wrapper = { width: 0, height: 0 };
+
 	onMount(() => {
 		const loader = new THREE.ImageBitmapLoader();
 		loader.setOptions({ imageOrientation: 'none' });
@@ -61,13 +63,20 @@
 {#if $aim}
 	<div class="text-lg">Current Aim: <code>{Math.floor($aim)}</code></div>
 {/if}
-<div class="relative" style="width: 400px; height: 400px">
-	<div class="absolute left-8 z-50 block" style={`top: ${20 + ($depth / (size / 2)) * 400}px;`}>
+<div
+	bind:clientHeight={wrapper.height}
+	bind:clientWidth={wrapper.width}
+	class="relative text-gray-300 w-full aspect-square h-52 md:h-72 lg:h-96 max-w-sm"
+>
+	<div
+		class="absolute left-8 z-50 block"
+		style={`top: ${20 + ($depth / (size / 2)) * wrapper.height}px;`}
+	>
 		depth <code>{Math.floor($depth)}</code>
 	</div>
 	<div
 		class="absolute top-6 z-50 block"
-		style={`left: ${20 + ($horizontal / (size / 2)) * 400}px;`}
+		style={`left: ${20 + ($horizontal / (size / 2)) * wrapper.width}px;`}
 	>
 		position <code>{Math.floor($horizontal / xScale)}</code>
 	</div>
