@@ -17,15 +17,17 @@
 {#each [p1, p2] as part, i}
 	<section class="space-y-4 mt-4">
 		<h4 class="text-2xl font-bold">Part {i + 1}</h4>
+		<p class="font-bold">
+			Total increases
+			<code>{part.result}</code>
+		</p>
 		<p>Input</p>
-		<code class="block px-4 py-2 bg-base-200 h-40 overflow-y-auto">
+		<code class="block px-4 py-2 bg-base-200 columns-2 md:columns-4 lg:columns-6">
 			{#each part.lines as line, i}
 				{line}
 				{#if part.increases.includes(i)} Increase {/if}
 				<br />
 			{/each}
 		</code>
-		<p class="font-bold">Total increases</p>
-		<code>{part.result}</code>
 	</section>
 {/each}

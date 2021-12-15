@@ -6,8 +6,8 @@
 
 <script lang="ts">
 	import { part1, part2 } from '$lib/2';
-
 	import SubmarineCanvas from './_SubmarineCanvas.svelte';
+
 	export let input: string;
 </script>
 

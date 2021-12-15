@@ -1,7 +1,3 @@
-import { openFile } from '../helper.ts/index.js';
-
-const data = await openFile('4');
-
 const [numbersLine, ...rest] = data.split('\n');
 
 const numbers = numbersLine.split(',').map((v) => Number(v));
@@ -79,5 +75,3 @@ for (let number of numbers) {
 		}
 	}
 }
-
-console.log(sum);

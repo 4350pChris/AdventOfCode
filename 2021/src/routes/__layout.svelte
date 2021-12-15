@@ -7,7 +7,7 @@
 <div class="rounded-lg shadow bg-base-200 drawer drawer-mobile">
 	<input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
 	<main
-		class="flex-grow flex flex-col p-4 md:p-8 lg:p-16 items-center overflow-x-hidden bg-base-100 text-base-content drawer-content"
+		class="flex flex-col p-4 md:p-8 lg:p-16 items-center overflow-x-hidden bg-base-100 text-base-content drawer-content"
 	>
 		<label for="my-drawer-2" class="mb-4 btn btn-primary drawer-button lg:hidden">open menu</label>
 		<a class="link text-lg" href={`/input/${$activeDay}.txt`} target="_blank">Input</a>
