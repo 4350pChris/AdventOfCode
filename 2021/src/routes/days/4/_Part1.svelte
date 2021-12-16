@@ -35,7 +35,7 @@
 <button class="btn btn-outline" on:click={handleClick}>Draw next number</button>
 <p>Numbers: {drawn}</p>
 <div>
-	{#each localFields.sort((a, b) => b.count - a.count) as field}
-		<FieldBox {...field} />
+	{#each localFields.sort((a, b) => b.count - a.count) as { field, count }}
+		<FieldBox {field} done={count === 5} />
 	{/each}
 </div>

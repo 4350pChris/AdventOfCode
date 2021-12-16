@@ -48,6 +48,14 @@ export function makeNumbers(line: string): number[] {
 	return line.split(',').map((v) => Number(v));
 }
 
+function getSum(field: Field) {
+	const sum = field.reduce(
+		(acc, row) => acc + row.reduce((rowSum, [n, set]) => (set ? rowSum : rowSum + n), 0),
+		0
+	);
+	return sum;
+}
+
 export function* part1(
 	numbers: number[],
 	fields: Field[]
@@ -64,10 +72,34 @@ export function* part1(
 		}
 		const winner = localFields.find(({ count }) => count === 5);
 		if (winner) {
-			const sum = winner.field.reduce(
-				(acc, row) => acc + row.reduce((rowSum, [n, set]) => (set ? rowSum : rowSum + n), 0),
-				0
-			);
+			const sum = getSum(winner.field);
+			return [number, localFields, sum * number];
+		}
+		yield [number, localFields];
+	}
+}
+
+export function* part2(
+	numbers: number[],
+	fields: Field[]
+): Generator<
+	[drawn: number, fields: { field: Field; count: number }[]],
+	[drawn: number, fields: { field: Field; count: number }[], result: number],
+	unknown
+> {
+	let loser: { field: Field; count: number };
+	const localFields = fields.map((field) => ({ field, count: 0 }));
+	for (const number of numbers) {
+		for (const i in localFields) {
+			localFields[i].field = setNumber(localFields[i].field, number);
+			localFields[i].count = setMaxCount(localFields[i].field);
+		}
+		const losers = localFields.filter(({ count }) => count < 5);
+		if (losers.length === 1) {
+			loser = losers[0];
+		}
+		if (loser?.count === 5) {
+			const sum = getSum(loser.field);
 			return [number, localFields, sum * number];
 		}
 		yield [number, localFields];
