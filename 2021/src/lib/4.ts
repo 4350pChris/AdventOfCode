@@ -1,77 +1,75 @@
-const [numbersLine, ...rest] = data.split('\n');
+type Data = [n: number, set: boolean][];
+export type Field = Data[];
 
-const numbers = numbersLine.split(',').map((v) => Number(v));
-
-type Data = { [n: number]: boolean };
-type Field = Data[];
-
-const fields = rest
-	.filter((v) => v !== '')
-	.reduce((acc, v, i) => {
-		const bucket = Math.floor(i / 5);
-		if (!acc[bucket]) {
-			acc.push([]);
-		}
-		const row: Data = v
-			.split(' ')
-			.filter((v) => v !== '')
-			.reduce((row, v) => {
-				row[Number(v)] = false;
-				return row;
-			}, {} as Data);
-
-		acc[bucket].push(row);
-		return acc;
-	}, [] as Field[]);
-
-function checkWin(field: Field) {
-	const allTrue = (row: Data) => !Object.values(row).some((v) => !v);
-
-	for (let row of field) {
-		if (allTrue(row)) {
-			return true;
-		}
-	}
-	let columns: Data[] = [];
-	field.forEach((v, i) => {
-		if (!columns[i]) {
-			columns.push({});
-		}
-		const [n, isSet] = Object.entries(v)[i];
-		columns[i][n] = isSet;
+function transposeField(field: Field) {
+	const columns: Field = [];
+	field.forEach((row) => {
+		row.forEach(([n, isSet], i) => {
+			if (!columns[i]) {
+				columns.push([]);
+			}
+			columns[i].push([n, isSet]);
+		});
 	});
-	for (let col of columns) {
-		if (allTrue(col)) {
-			return true;
-		}
-	}
-
-	return false;
+	return columns;
 }
 
-function setNumber(field: Field, n: number) {
-	for (let row in field) {
-		for (let col in row) {
-			if (col === n) {
-				field[row][col] = true;
-			}
-		}
-	}
+function setMaxCount(field: Field) {
+	const trueCount = (row: Data) => row.filter((v) => v[1]).length;
+
+	const columns = transposeField(field);
+	const counts = [...field.map((row) => trueCount(row)), ...columns.map((col) => trueCount(col))];
+	return Math.max(...counts);
 }
 
-for (let number of numbers) {
-	setNumber(number);
-	for (let field of fields) {
-		if (checkWin(field)) {
-			console.log('Winning');
-			let sum = 0;
-			for (let row of field) {
-				for (let col of row) {
-					if (col) {
-						sum += 1;
-					}
-				}
+function setNumber(field: Field, n: number): Field {
+	return field.map((row) => row.map(([num, isSet]) => [num, isSet || num === n]));
+}
+
+export function makeFields(input: string[]): Field[] {
+	return input
+		.filter((v) => v !== '')
+		.reduce((acc, v, i) => {
+			const bucket = Math.floor(i / 5);
+			if (!acc[bucket]) {
+				acc.push([]);
 			}
+			const row: Data = v
+				.split(' ')
+				.filter((v) => v !== '')
+				.reduce((row, v) => [...row, [Number(v), false]], [] as Data);
+
+			acc[bucket].push(row);
+			return acc;
+		}, [] as Field[]);
+}
+
+export function makeNumbers(line: string): number[] {
+	return line.split(',').map((v) => Number(v));
+}
+
+export function* part1(
+	numbers: number[],
+	fields: Field[]
+): Generator<
+	[drawn: number, fields: { field: Field; count: number }[]],
+	[drawn: number, fields: { field: Field; count: number }[], result: number],
+	unknown
+> {
+	const localFields = fields.map((field) => ({ field, count: 0 }));
+	for (const number of numbers) {
+		for (const i in localFields) {
+			localFields[i].field = setNumber(localFields[i].field, number);
+			localFields[i].count = setMaxCount(localFields[i].field);
 		}
+		const winner = localFields.find(({ count }) => count === 5);
+		if (winner) {
+			const sum = winner.field.reduce(
+				(acc, row) => acc + row.reduce((rowSum, [n, set]) => (set ? rowSum : rowSum + n), 0),
+				0
+			);
+			return [number, localFields, sum * number];
+		}
+		yield [number, localFields];
 	}
 }
