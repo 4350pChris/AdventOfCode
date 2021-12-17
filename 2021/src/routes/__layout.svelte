@@ -4,6 +4,9 @@
 	const days = Array.from(Array(25)).map((_, i) => i + 1);
 </script>
 
+<svelte:head>
+	<title>Day {$activeDay}</title>
+</svelte:head>
 <div class="rounded-lg shadow bg-base-200 drawer drawer-mobile">
 	<input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
 	<main

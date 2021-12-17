@@ -39,7 +39,7 @@
 	}
 </script>
 
-<h3 class="text-6xl">U tryna get the pipe?</h3>
+<h3 class="text-6xl">Lanternfish</h3>
 <div class="tabs mt-4">
 	<button
 		class="tab text-lg tab-bordered"
@@ -70,6 +70,5 @@
 			{/if}
 		</button>
 		<button class="btn btn-secondary" on:click={() => init(activePart)}>Reset</button>
-		<!-- <button class="btn btn-secondary" on:click={() => full()}>To end</button> -->
 	</div>
 </section>
