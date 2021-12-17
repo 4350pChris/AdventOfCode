@@ -1,12 +1,12 @@
 <script lang="ts" context="module">
 	import { load } from '$lib/loadInput';
-	import { useRunner } from '$lib/runner';
 
 	export { load };
 </script>
 
 <script lang="ts">
 	import { part1, part2, type Result, type Position, type Pipe } from '$lib/5';
+	import { useRunner } from '$lib/runner';
 
 	export let input: string;
 
@@ -33,7 +33,7 @@
 
 	function full() {
 		const ps = [];
-		let inter;
+		let inter: Position[] = [];
 		for (const res of gen) {
 			if (typeof res === 'number') {
 				result = res;

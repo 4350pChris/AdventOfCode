@@ -43,10 +43,6 @@ function pointIsOnLine(point: Position, pipe: Pipe) {
 		// a positive slope means the line goes from (minX|minY) to (maxX, maxY)
 		// a negative one means it's (minX|maxY) to (maxX| minY)
 		// when negative the function is y = m*x + maxY
-		// if (slope < 0) {
-		// 	console.log(start);
-		// 	debugger;
-		// }
 		return py === slope * px + (slope < 0 ? maxY - minY : 0);
 	}
 	return false;
