@@ -8,7 +8,7 @@
 	import { makeFields, makeNumbers, part1, part2, type Field } from '$lib/4';
 	import FieldBox from './_FieldBox.svelte';
 	import { fade } from 'svelte/transition';
-	import { onDestroy } from 'svelte';
+	import { useRunner } from '$lib/runner';
 
 	export let input: string;
 
@@ -22,35 +22,6 @@
 	let result = 0;
 	let drawn: number[] = [];
 	let localFields: { field: Field; count: number }[] = [];
-	let runner: number;
-
-	$: init(activePart);
-
-	function init(active: number) {
-		done = false;
-		result = 0;
-		drawn = [];
-		localFields = fields.map((field) => ({
-			field,
-			count: 0
-		}));
-		gen = active === 1 ? part1(numbers, fields) : part2(numbers, fields);
-		clearInterval(runner);
-		runner = undefined;
-	}
-
-	onDestroy(stop);
-
-	function run() {
-		runner = window.setInterval(handleClick, 1000);
-	}
-
-	function stop() {
-		if (runner) {
-			clearInterval(runner);
-			runner = undefined;
-		}
-	}
 
 	const handleClick = () => {
 		if (!done) {
@@ -64,6 +35,22 @@
 			}
 		}
 	};
+
+	const { run, stop, running } = useRunner(handleClick);
+
+	$: init(activePart);
+
+	function init(active: number) {
+		done = false;
+		result = 0;
+		drawn = [];
+		localFields = fields.map((field) => ({
+			field,
+			count: 0
+		}));
+		gen = active === 1 ? part1(numbers, fields) : part2(numbers, fields);
+		stop();
+	}
 </script>
 
 <h3 class="text-6xl">Binary Diagnostics</h3>
@@ -88,9 +75,9 @@
 			class="btn btn-outline"
 			class:btn-disabled={done}
 			disabled={done}
-			on:click={() => (runner ? stop() : run())}
+			on:click={() => ($running ? stop() : run())}
 		>
-			{#if runner}
+			{#if $running}
 				Stop
 			{:else}
 				run
