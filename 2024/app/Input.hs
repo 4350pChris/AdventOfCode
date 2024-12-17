@@ -1,6 +1,6 @@
 module Input where
 
-parseInputFromFile :: String -> IO [String]
-parseInputFromFile filename = do
-  contents <- readFile filename
+parseInputForDay :: String -> IO [String]
+parseInputForDay day = do
+  contents <- readFile ("inputs/" ++ day ++ ".txt")
   return $ lines contents

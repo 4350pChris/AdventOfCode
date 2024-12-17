@@ -1,10 +1,9 @@
 module Main where
 
 -- import Aoc1
-import Aoc2
+-- import Aoc2
+import Aoc3
 
 main :: IO ()
 main = do
-  putStrLn "Day 1"
-  -- Aoc1.main
-  Aoc2.main
+  Aoc3.main

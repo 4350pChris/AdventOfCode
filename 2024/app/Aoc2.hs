@@ -1,6 +1,6 @@
 module Aoc2 where
 
-import Input (parseInputFromFile)
+import Input (parseInputForDay)
 
 main :: IO ()
 main = do
@@ -9,9 +9,9 @@ main = do
   putStrLn "Part 2"
   part2
 
-parseInput :: String -> IO [[Int]]
-parseInput filename = do
-  contents <- parseInputFromFile filename
+parseInput :: IO [[Int]]
+parseInput = do
+  contents <- parseInputForDay "2"
   -- contents is a list of strings, where each string is a row consisting of multiple numbers separated by spaces
   -- we want to split each row into a list of numbers
   return $ map (map read . words) contents
@@ -44,7 +44,7 @@ rowPermutations row = do
 
 part1 :: IO ()
 part1 = do
-  input <- parseInput "inputs/2.txt"
+  input <- parseInput
   -- we want to filter out the rows that are safe
   let safeRows = filter isSafe input
   print $ length safeRows
@@ -52,7 +52,7 @@ part1 = do
 part2 :: IO ()
 part2 = do
   -- same as part1, except if we can remove a single number from a row and it becomes safe, we want to count that row
-  input <- parseInput "inputs/2.txt"
+  input <- parseInput
   -- for each row, check itself and all possible rows that can be created by removing a single number
   let safeRows = filter (any isSafe . rowPermutations) input
   print $ length safeRows
