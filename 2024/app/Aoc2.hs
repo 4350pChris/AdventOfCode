@@ -1,20 +1,17 @@
 module Aoc2 where
 
-import Input (parseInputForDay)
-
-main :: IO ()
-main = do
+main :: [String] -> IO ()
+main input = do
+  let parsed = parseInput input
   putStrLn "Part 1"
-  part1
+  part1 parsed
   putStrLn "Part 2"
-  part2
+  part2 parsed
 
-parseInput :: IO [[Int]]
-parseInput = do
-  contents <- parseInputForDay "2"
-  -- contents is a list of strings, where each string is a row consisting of multiple numbers separated by spaces
-  -- we want to split each row into a list of numbers
-  return $ map (map read . words) contents
+-- contents is a list of strings, where each string is a row consisting of multiple numbers separated by spaces
+-- we want to split each row into a list of numbers
+parseInput :: [String] -> [[Int]]
+parseInput = map (map read . words)
 
 allEitherIncreasingOrDecreasing :: [Int] -> Bool
 allEitherIncreasingOrDecreasing deltas =
@@ -42,17 +39,14 @@ rowPermutations row = do
   index <- [0 .. length row - 1]
   return $ take index row ++ drop (index + 1) row
 
-part1 :: IO ()
-part1 = do
-  input <- parseInput
+part1 :: [[Int]] -> IO ()
+part1 input = do
   -- we want to filter out the rows that are safe
   let safeRows = filter isSafe input
   print $ length safeRows
 
-part2 :: IO ()
-part2 = do
-  -- same as part1, except if we can remove a single number from a row and it becomes safe, we want to count that row
-  input <- parseInput
+part2 :: [[Int]] -> IO ()
+part2 input = do
   -- for each row, check itself and all possible rows that can be created by removing a single number
   let safeRows = filter (any isSafe . rowPermutations) input
   print $ length safeRows

@@ -1,14 +1,13 @@
 module Aoc3 where
 
 import Data.List (intercalate)
-import Input (parseInputForDay)
 import Text.Regex.TDFA ((=~))
 
-main :: IO ()
-main = do
+main :: [String] -> IO ()
+main input = do
   putStrLn "Day 3"
-  part1
-  part2
+  part1 input
+  part2 input
 
 -- get all statements that look like "mul(1,2)" from the input
 -- which looks like "xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]then(mul(11,8)mul(8,5))"
@@ -18,10 +17,6 @@ parseMulStatements input = input =~ "mul\\(([[:digit:]]+),([[:digit:]]+)\\)" :: 
 
 stmtToTuple :: [String] -> (Int, Int)
 stmtToTuple stmt = (read (stmt !! 1) :: Int, read (stmt !! 2) :: Int)
-
-parseInput :: IO [String]
-parseInput = do
-  parseInputForDay "3"
 
 -- drop everything between "do()" and "don't()"
 -- "do()mul(1,2)don't()mul(2,3)" -> "mul(1,2)"
@@ -36,25 +31,22 @@ dropParts = dropParts' True
     dropParts' False (_ : xs) = dropParts' False xs
     dropParts' True (x : xs) = x : dropParts' True xs
 
-part1 :: IO ()
-part1 = do
-  input <- parseInput
+calculateResult :: [[String]] -> Int
+calculateResult = sum . map (uncurry (*) . stmtToTuple)
+
+part1 :: [String] -> IO ()
+part1 input = do
   let mulStatements = concatMap parseMulStatements input
-      tuples = map stmtToTuple mulStatements
-      -- do multiplication, then sum up all the results
-      result = sum $ map (uncurry (*)) tuples
+      result = calculateResult mulStatements
   print result
 
-part2 :: IO ()
-part2 = do
-  input <- parseInput
+part2 :: [String] -> IO ()
+part2 input = do
   -- this time we need to account for do() and don't() statements
   -- truncate the input, removing everything between don't() and do()
   -- to only get the enabled mul statements
-
   -- first concatenate the input strings, as we need to process it as a whole
   let enabledMulStatements = dropParts (intercalate "" input)
       mulStatements = parseMulStatements enabledMulStatements
-      tuples = map stmtToTuple mulStatements
-      result = sum $ map (uncurry (*)) tuples
+      result = calculateResult mulStatements
   print result
