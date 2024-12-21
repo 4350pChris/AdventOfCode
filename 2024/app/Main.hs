@@ -5,10 +5,11 @@ import Aoc2
 import Aoc3
 import Aoc4
 import Aoc5
+import Aoc6
 import Input (parseInputForDay)
 
 day :: String
-day = "5"
+day = "6"
 test :: Bool
 test = False
 
@@ -25,4 +26,5 @@ runDay = do
     "3" -> Aoc3.main input
     "4" -> Aoc4.main input
     "5" -> Aoc5.main input
+    "6" -> Aoc6.main input
     _ -> putStrLn "Invalid day"
