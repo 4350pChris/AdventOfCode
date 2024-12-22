@@ -3,8 +3,8 @@ module Aoc3 where
 import Data.List (intercalate)
 import Text.Regex.TDFA ((=~))
 
-main :: [String] -> IO ()
-main input = do
+solve :: [String] -> IO ()
+solve input = do
   putStrLn "Day 3"
   part1 input
   part2 input

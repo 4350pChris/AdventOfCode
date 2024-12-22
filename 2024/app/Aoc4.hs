@@ -48,8 +48,8 @@ occurencesOf str = length . indicesOfSubStr str
 countOccurences :: String -> [String] -> Int
 countOccurences str input = sum $ map (occurencesOf str) input
 
-main :: Main
-main input = do
+solve :: Main
+solve input = do
   putStrLn "Part 1"
   print $ part1 input
   putStrLn "Part 2"

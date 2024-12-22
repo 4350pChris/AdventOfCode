@@ -45,8 +45,8 @@ moveCoord (x, y) dir = (x + dx, y + dy)
 move :: Guard -> Guard
 move (Guard coord dir) = Guard (moveCoord coord dir) dir
 
-main :: Main
-main input = do
+solve :: Main
+solve input = do
   let grid = parseInput input
       guard = Guard (startingCoord grid) North
       initialState = (grid, guard)

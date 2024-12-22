@@ -9,8 +9,8 @@ import Data.Maybe (isNothing)
 
 type RuleMap = Map Int [Int]
 
-main :: Main
-main input = do
+solve :: Main
+solve input = do
   let (rules, pages) = parseInput input
       ruleMap = rulesToMap rules
   putStrLn "Part 1"

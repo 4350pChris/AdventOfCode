@@ -61,7 +61,7 @@ executable x2024
     main-is:          Main.hs
 
     -- Modules included in this executable, other than Main.
-    other-modules:    AocBase Input Aoc1 Aoc2 Aoc3 Aoc4 Aoc5 Aoc6
+    other-modules:    AocBase Input Aoc1 Aoc2 Aoc3 Aoc4 Aoc5 Aoc6 Aoc7
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
@@ -71,7 +71,8 @@ executable x2024
         base ^>=4.17.2.1,
         regex-tdfa ^>= 1.3.2.2,
         universe-base ^>= 1.1.4,
-        containers ^>= 0.6.7
+        containers ^>= 0.6.7,
+        split
 
     -- Directories containing source files.
     hs-source-dirs:   app

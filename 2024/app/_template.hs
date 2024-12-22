@@ -2,8 +2,8 @@ module Aoc0 where
 
 import AocBase (Main)
 
-main :: Main
-main input = do
+solve :: Main
+solve input = do
   putStrLn "Part 1"
   print $ part1 input
   putStrLn "Part 2"
@@ -15,3 +15,5 @@ part1 = undefined
 
 part2 :: a -> b
 part2 = undefined
+
+parseInput :: [String] -> a

@@ -3,8 +3,8 @@ module Aoc1 where
 import Data.Bifunctor (Bifunctor (bimap))
 import Data.List (sort)
 
-main :: [String] -> IO ()
-main input = do
+solve :: [String] -> IO ()
+solve input = do
   putStrLn "Part 1"
   part1 input
   putStrLn "Part 2"

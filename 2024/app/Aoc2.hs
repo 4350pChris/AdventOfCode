@@ -1,7 +1,7 @@
 module Aoc2 where
 
-main :: [String] -> IO ()
-main input = do
+solve :: [String] -> IO ()
+solve input = do
   let parsed = parseInput input
   putStrLn "Part 1"
   part1 parsed
