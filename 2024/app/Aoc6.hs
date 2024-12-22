@@ -2,6 +2,7 @@ module Aoc6 where
 
 import AocBase (Main)
 import qualified Data.Map as Map
+import Data.Bifunctor (first)
 import Data.Maybe (isJust)
 
 data Direction = North | East | South | West
@@ -61,57 +62,36 @@ part1 :: CurrentState -> Int
 part1 = length . everyVisitedCell . fst . last . runUntilOutside
 
 part2 :: CurrentState -> Int
-part2 = length . allLoops . fst . last . runUntilOutside
+part2 = length . filter (isJust . floydTortoiseAndHare) . withObstacles
 
--- for part 2 we need to find loops we can create by inserting an obstacle
--- we can do this by finding 3 obstacles that are in a certain position
+-- along each visited cell, we add an obstacle
+withObstacles :: CurrentState -> [CurrentState]
+withObstacles initial = map (\cell -> first (Map.insert cell Obstacle) initial) . everyVisitedCell . fst . last $ runUntilOutside initial
 
-allLoops :: Grid -> [Maybe (Coord, Coord, Coord, Coord)]
-allLoops grid = concatMap (filter isJust . findObstacleLoop grid) (everyObstacle grid)
+floydTortoiseAndHare :: CurrentState -> Maybe Coord
+floydTortoiseAndHare state = do
+  -- first we let the hare run twice as fast as the tortoise
+  -- we use the original guard as the tortoise
+  -- and a new guard that moves twice as fast as the original guard as the hare
+  -- we run the hare twice as fast as the tortoise untile they meet
+  hare <- runUntilMeet (runTick state) (advanceHare state) advanceHare
+  -- now find the first repetition by resetting the tortoise and letting them run at the same speed
+  findIntersection state hare
+  where advanceHare = runTick . runTick
 
-everyObstacle :: Grid -> [Coord]
-everyObstacle = Map.keys . Map.filter (== Obstacle)
+-- do runUntilMeet with the tortoise and hare running at the same speed
+findIntersection :: CurrentState -> CurrentState -> Maybe Coord
+findIntersection tortoise hare = runUntilMeet tortoise hare runTick >>= \(_, guard) -> Just (position guard)
 
-findObstacleLoop :: Grid -> Coord -> [Maybe (Coord, Coord, Coord, Coord)]
-findObstacleLoop grid coord = filter isJust possible
-  where
-    possible = map (\dir -> findPossibleLoops grid coord dir []) [North, East, South, West]
-
--- from a list of 3 coords, find the missing corner to make it a rectangle
-findMissingCorner :: (Coord, Coord, Coord) -> Coord
-findMissingCorner ((x1, y1), (x2, y2), (x3, y3)) = (x, y)
-  where
-    x
-      | x1 == x2 = x3
-      | x1 == x3 = x2
-      | otherwise = x1
-    y
-      | y1 == y2 = y3
-      | y1 == y3 = y2
-      | otherwise = y1
-
-findPossibleLoops :: Grid -> Coord -> Direction -> [Coord] -> Maybe (Coord, Coord, Coord, Coord)
-findPossibleLoops _ _ _ [a, b, c] = Just (a, b, c, findMissingCorner (a, b, c))
-findPossibleLoops grid coord dir carry = do
-  let newDir = turnRight dir
-      -- move in the opposite direction of our original direction to get the coord where the guard would turn
-      nextCoord = moveCoord coord (turnRight newDir)
-  nextObstacle <- findObstacle grid nextCoord newDir
-  findPossibleLoops grid nextObstacle newDir (nextCoord : carry)
-
--- move in a direction until we find an obstacle
-findObstacle :: Grid -> Coord -> Direction -> Maybe Coord
-findObstacle grid (x, y) dir = do
-  cell <- Map.lookup (x, y) grid
-  case cell of
-    Obstacle -> Just (x, y)
-    Unvisited -> Nothing
-    Visited -> findObstacle grid (x + dx, y + dy) dir
-  where
-    (dx, dy) = movementDelta dir
+runUntilMeet :: CurrentState -> CurrentState -> (CurrentState -> CurrentState) -> Maybe CurrentState
+runUntilMeet tortoise hare advanceHare
+  -- if one runs out of bounds, we can stop
+  | not (withinGrid tortoise) || not (withinGrid hare) = Nothing
+  | position (snd tortoise) == position (snd hare) && facing (snd tortoise) == facing (snd hare) = Just tortoise
+  | otherwise = runUntilMeet (runTick tortoise) (advanceHare hare) advanceHare
 
 runUntilOutside :: CurrentState -> [CurrentState]
-runUntilOutside state = takeWhile withinGrid $ iterate runTick state
+runUntilOutside = takeWhile withinGrid . iterate runTick
 
 runTick :: CurrentState -> CurrentState
 runTick (grid, guard) = (newGrid, newGuard)
@@ -124,6 +104,7 @@ printGrid grid = do
   let ks = Map.keys grid
       height = maximum $ map snd ks
   mapM_ printLine [0 .. height]
+  putStrLn "-------"
   where
     printLine y = do
       mapM_ (printCell y) [0 .. maximum (map fst (Map.keys grid))]
