@@ -13,7 +13,7 @@ import Input (parseInputForDay)
 day :: String
 day = "8"
 test :: Bool
-test = True
+test = False
 
 main :: IO ()
 main = do

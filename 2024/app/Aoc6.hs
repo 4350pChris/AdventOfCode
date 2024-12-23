@@ -99,20 +99,22 @@ runTick (grid, guard) = (newGrid, newGuard)
     newGuard = if canMove (grid, move guard) then move guard else turnGuardRight guard
     newGrid = if withinGrid (grid, newGuard) then Map.insert (position newGuard) Visited grid else grid
 
-printGrid :: Grid -> IO ()
-printGrid grid = do
-  let ks = Map.keys grid
-      height = maximum $ map snd ks
-  mapM_ printLine [0 .. height]
+printGrid :: Map.Map Coord v -> (Map.Map Coord v -> Int -> Int -> IO ()) -> IO ()
+printGrid grid printF = do
+  let coords = Map.keys grid
+  let maxY = maximum $ map snd coords
+  mapM_ printLine [0 .. maxY]
   putStrLn "-------"
   where
     printLine y = do
-      mapM_ (printCell y) [0 .. maximum (map fst (Map.keys grid))]
+      mapM_ (printF grid y) [0 .. maximum (map fst (Map.keys grid))]
       putStrLn ""
-    printCell y x = case (Map.!) grid (x, y) of
-      Unvisited -> putStr "."
-      Visited -> putStr "X"
-      Obstacle -> putStr "#"
+
+printCell :: Grid -> Int -> Int -> IO ()
+printCell grid y x = case (Map.!) grid (x, y) of
+  Unvisited -> putStr "."
+  Visited -> putStr "X"
+  Obstacle -> putStr "#"
 
 withinGrid :: CurrentState -> Bool
 withinGrid (grid, guard) = Map.member (position guard) grid
