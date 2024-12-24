@@ -11,12 +11,13 @@ import Aoc8
 import Aoc9
 import Aoc10
 import Aoc11
+import Aoc12
 import Input (parseInputForDay)
 
 day :: String
-day = "11"
+day = "12"
 test :: Bool
-test = False
+test = True
 
 main :: IO ()
 main = do
@@ -37,4 +38,5 @@ runDay = do
     "9" -> Aoc9.solve input
     "10" -> Aoc10.solve input
     "11" -> Aoc11.solve input
+    "12" -> Aoc12.solve input
     _ -> putStrLn "Invalid day"
