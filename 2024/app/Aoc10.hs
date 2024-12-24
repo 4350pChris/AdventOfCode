@@ -16,25 +16,25 @@ solve input = do
   res1 <- part1 grid
   putStrLn $ "Result: " ++ show res1
   putStrLn "Part 2"
-  print $ part2 grid
+  res2 <- part2 grid
+  putStrLn $ "Result: " ++ show res2
   putStrLn "Done"
 
 part1 :: Grid -> IO Int
 part1 grid = do
   let paths = map (pathsFromCoord grid) (startingPoints grid)
-  print paths
-  let scores = map scoreForPaths paths
-  print scores
-  pure $ sum scores
+  let pairs = map startEndPairs paths
+  let uniquePairs = nub $ concat pairs
+  pure $ length uniquePairs
 
-part2 :: Grid -> Int
-part2 = undefined
+part2 :: Grid -> IO Int
+part2 grid = do
+  let paths = map (pathsFromCoord grid) (startingPoints grid)
+  let pairs = map startEndPairs paths
+  pure $ length $ concat pairs
 
-scoreForPaths :: [[Grids.Coord]] -> Int
-scoreForPaths paths = length $ nub startEndPair
-  where
-    fullLengthPaths = filter ((==) 10 . length) paths
-    startEndPair = map (\p -> (head p, last p)) fullLengthPaths
+startEndPairs :: [[Grids.Coord]] -> [(Grids.Coord, Grids.Coord)]
+startEndPairs = map (\p -> (head p, last p)) . filter ((==) 10 . length)
 
 pathsFromCoord :: Grid -> Grids.Coord -> [[Grids.Coord]]
 pathsFromCoord grid coord 
