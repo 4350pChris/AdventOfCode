@@ -1,54 +1,39 @@
 module Aoc6 where
 
 import AocBase (Main)
+import qualified Grids
 import qualified Data.Map as Map
 import Data.Bifunctor (first)
 import Data.Maybe (isJust)
 
-data Direction = North | East | South | West
-  deriving (Eq, Show)
-
 data Cell = Unvisited | Visited | Obstacle
   deriving (Eq, Show)
 
-type Coord = (Int, Int)
-
-type Grid = Map.Map Coord Cell
-
 data Guard = Guard
-  { position :: Coord,
-    facing :: Direction
+  { position :: Grids.Coord,
+    facing :: Grids.Direction
   }
+
+type Grid = Grids.Grid Cell
 
 type CurrentState = (Grid, Guard)
 
-turnRight :: Direction -> Direction
-turnRight North = East
-turnRight East = South
-turnRight South = West
-turnRight West = North
+turnRight :: Grids.Direction -> Grids.Direction
+turnRight Grids.North = Grids.East
+turnRight Grids.East = Grids.South
+turnRight Grids.South = Grids.West
+turnRight Grids.West = Grids.North
 
 turnGuardRight :: Guard -> Guard
 turnGuardRight guard = guard {facing = turnRight (facing guard)}
 
-movementDelta :: Direction -> Coord
-movementDelta North = (0, -1)
-movementDelta East = (1, 0)
-movementDelta South = (0, 1)
-movementDelta West = (-1, 0)
-
-moveCoord :: Coord -> Direction -> Coord
-moveCoord (x, y) dir = (x + dx, y + dy)
-  where
-    (dx, dy) = movementDelta dir
-
 move :: Guard -> Guard
-move (Guard coord dir) = Guard (moveCoord coord dir) dir
+move (Guard coord dir) = Guard (Grids.moveCoord coord dir) dir
 
 solve :: Main
 solve input = do
-  let grid = parseInput input
-      guard = Guard (startingCoord grid) North
+  let grid = Grids.parseInput cellFromChar input
+      guard = Guard (startingCoord grid) Grids.North
       initialState = (grid, guard)
   putStrLn "Part 1"
   print $ part1 initialState
@@ -68,7 +53,7 @@ part2 = length . filter (isJust . floydTortoiseAndHare) . withObstacles
 withObstacles :: CurrentState -> [CurrentState]
 withObstacles initial = map (\cell -> first (Map.insert cell Obstacle) initial) . everyVisitedCell . fst . last $ runUntilOutside initial
 
-floydTortoiseAndHare :: CurrentState -> Maybe Coord
+floydTortoiseAndHare :: CurrentState -> Maybe Grids.Coord
 floydTortoiseAndHare state = do
   -- first we let the hare run twice as fast as the tortoise
   -- we use the original guard as the tortoise
@@ -80,7 +65,7 @@ floydTortoiseAndHare state = do
   where advanceHare = runTick . runTick
 
 -- do runUntilMeet with the tortoise and hare running at the same speed
-findIntersection :: CurrentState -> CurrentState -> Maybe Coord
+findIntersection :: CurrentState -> CurrentState -> Maybe Grids.Coord
 findIntersection tortoise hare = runUntilMeet tortoise hare runTick >>= \(_, guard) -> Just (position guard)
 
 runUntilMeet :: CurrentState -> CurrentState -> (CurrentState -> CurrentState) -> Maybe CurrentState
@@ -99,18 +84,10 @@ runTick (grid, guard) = (newGrid, newGuard)
     newGuard = if canMove (grid, move guard) then move guard else turnGuardRight guard
     newGrid = if withinGrid (grid, newGuard) then Map.insert (position newGuard) Visited grid else grid
 
-printGrid :: Map.Map Coord v -> (Map.Map Coord v -> Int -> Int -> IO ()) -> IO ()
-printGrid grid printF = do
-  let coords = Map.keys grid
-  let maxY = maximum $ map snd coords
-  mapM_ printLine [0 .. maxY]
-  putStrLn "-------"
-  where
-    printLine y = do
-      mapM_ (printF grid y) [0 .. maximum (map fst (Map.keys grid))]
-      putStrLn ""
+printGrid :: Grid -> IO ()
+printGrid = Grids.printGrid printCell
 
-printCell :: Grid -> Int -> Int -> IO ()
+printCell :: Grids.PrintCell Cell
 printCell grid y x = case (Map.!) grid (x, y) of
   Unvisited -> putStr "."
   Visited -> putStr "X"
@@ -129,17 +106,11 @@ canMove state = case currentCell state of
 currentCell :: CurrentState -> Maybe Cell
 currentCell (grid, guard) = Map.lookup (position guard) grid
 
-everyVisitedCell :: Grid -> [Coord]
+everyVisitedCell :: Grid -> [Grids.Coord]
 everyVisitedCell = Map.keys . Map.filter (== Visited)
 
-startingCoord :: Grid -> Coord
+startingCoord :: Grid -> Grids.Coord
 startingCoord = head . everyVisitedCell
-
-parseInput :: [String] -> Grid
-parseInput input = Map.fromList $ do
-  (y, line) <- zip [0 ..] input
-  (x, char) <- zip [0 ..] line
-  pure ((x, y), cellFromChar char)
 
 cellFromChar :: Char -> Cell
 cellFromChar '.' = Unvisited
