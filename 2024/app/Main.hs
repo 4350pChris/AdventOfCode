@@ -13,7 +13,7 @@ import Aoc10
 import Input (parseInputForDay)
 
 day :: String
-day = "6"
+day = "10"
 test :: Bool
 test = False
 
